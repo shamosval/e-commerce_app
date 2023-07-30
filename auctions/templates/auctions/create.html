@@ -1,0 +1,76 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Create Listing</h2>
+    </div>
+
+   
+
+    {% if message %}
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+                 {{message}}
+            </div>
+        </div>
+    {% endif %}
+
+    <div style="width: 550px; margin: 10px auto 10px;">
+
+    <form method="post" action="{% url 'create' %}">
+        {% csrf_token %}
+
+        <div class="form-floating mb-3">
+          <input required type="text" class="form-control" id="floatingInput" name="name" placeholder="Some Product Name">
+          <label for="floatingInput">Title</label>
+        </div>
+
+       
+        <textarea required rows="5" class="form-control mb-3" name="description" placeholder="Product description (up to 1000 characters)"></textarea>
+         
+
+        <div class="input-group mb-3">
+          <span class="input-group-text">$</span>
+          <input required type="number" class="form-control" step="0.01" name="price" placeholder="Price" aria-label="Starting bid">
+        </div>
+
+
+        <select class="form-select mb-3" name="category" id="categories" aria-label="Categories">
+          <option selected disabled>Select category</option>
+          {% for ctgr in categories %}
+                <option value="{{ctgr.id}}"> {{ ctgr.category}} </option>
+            {% endfor %}
+        </select>
+
+        
+        <div id="myField" class="form-floating mb-3" >
+          <input autocomplete="off" type="text" class="form-control" id="floatingInput3" name="new_category" placeholder="New category">
+          <label for="floatingInput3">Or add a new category</label>
+        </div>
+
+        <div  class="form-floating mb-3">
+          <input autocomplete="off" type="text" class="form-control" id="floatingInput4" name="image" placeholder="New category">
+          <label for="floatingInput4">Image URL</label>
+        </div>
+
+        <input type="submit" class="btn btn-outline-primary mb-3" value="List product">
+    </form>
+</div>
+
+
+<script>
+  // JavaScript
+  document.getElementById("categories").addEventListener("change", function() {
+    var selectValue = this.value;
+    var field = document.getElementById("myField");
+    
+    if (selectValue) {
+      field.style.display = "none";  // Hide the field
+    } else {
+      field.style.display = "block"; // Show the field
+    }
+  });
+</script>
+
+
+{% endblock %}

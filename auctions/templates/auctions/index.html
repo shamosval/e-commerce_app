@@ -1,0 +1,50 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% load humanize %}
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Active Listings</h2>
+        
+    </div>
+
+    {% if category %}
+        <div class="d-flex justify-content-center">
+            <h4><em>{{category}}</em></h6>
+        </div>
+    {% endif %}
+
+    {% if message %}
+    <div style="width: 550px; margin: 10px auto 10px;">
+        <div class="alert alert-danger" role="alert">
+             {{message}}
+        </div>
+    </div>
+        
+    {% endif %}
+    <div class="container m-auto">
+    <div class="row">
+    {% for product in products %}
+    <div class="col-sm-3 g-5">
+        <div class="card">
+            <div class="image-container"> 
+                <a href="{% url 'showproduct' title=product.name %}"  >
+                    <img src="{{ product.image | safe}}" class="square-image card-img-top" alt="Image of {{product.name}}">
+                </a>
+            </div>
+          <div class="card-body">
+            <h5 class="card-title">{{product.name}}</h5>
+            <h5 class="card-title text-danger ">${{product.price | intcomma}}</h5>
+            <p class="card-text">{{product.description |slice:":115"}}...</p>
+            <hr>
+            <p class="card-text small">Listed by: <strong>{{product.owner}}</strong> </p>
+
+            <p class="card-text small">Category: <a class="link-dark" href="show_ctg/{{product.category.category}}">{{product.category.category}}</a></p>
+            
+            <a href="{% url 'showproduct' title=product.name %}" class="btn btn-primary">Show product</a>
+          </div>
+        </div>
+    </div>
+    
+    {% endfor %}
+</div></div>
+{% endblock %}

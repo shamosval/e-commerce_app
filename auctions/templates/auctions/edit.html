@@ -1,0 +1,42 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Edit Listing</h2>
+    </div>
+
+    {% if message %}
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+                 {{message}}
+            </div>
+        </div>
+    {% endif %}
+
+<div style="width: 550px; margin: 10px auto 10px;">
+    <form method="post" action="{% url 'edit' product.name %}">
+        {% csrf_token %}
+
+
+        <label class="form-label" for="title">Title</label>
+        <input required type="text" class="form-control mb-3" id="title" name="name" value="{{product.name}}">
+          
+
+        <label for="description" class="form-label">Description</label>
+        <textarea id="description" required rows="5" class="form-control mb-3" name="description">{{product.description}}</textarea>
+        
+        <label for="categories" class="form-label">Category</label>
+        <select class="form-select mb-3" name="category" id="categories" aria-label="Categories">
+          <option value="{{product.category.id}}" selected>{{product.category.category}}</option>
+          {% for ctgr in categories %}
+                <option value="{{ctgr.id}}"> {{ ctgr.category}} </option>
+            {% endfor %}
+        </select>
+
+        <label class="form-label" for="image_url">Image URL</label>
+        <input class="form-control mb-3" id="image_url" type="text" name="image" value="{{product.image}}">
+        
+
+        <input class="btn btn-outline-primary mb-3" type="submit" value="Save changes">
+    </form>
+{% endblock %}

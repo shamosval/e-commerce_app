@@ -1,0 +1,316 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+{% load humanize %}
+
+    {# Various alert messages #}
+
+    {% if message %}
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+                 {{message}}
+            </div>
+        </div>
+    {% endif %}
+
+    {% if new_bid %}
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-success" role="alert">
+                 Success! You bid ${{ new_bid.bid }}. New price is ${{ new_bid.bid }}.
+            </div>
+        </div>
+    {% endif %}
+
+    {% if highest_bid %}
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-success" role="alert">
+                 The product was sold to {{highest_bid.bidder}} for ${{highest_bid.bid}}. 
+            </div>
+        </div>
+    {% endif %}  
+
+
+    {% if user.is_authenticated %}  
+        {% if winning_bid.bidder == user %}
+            <div style="width: 550px; margin: 10px auto 10px;">
+                <div class="alert alert-success" role="alert">
+                     Congratulations,  {{winning_bid.bidder}}, you have bought this product for ${{winning_bid.bid}}!
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+
+
+    {% if user.is_authenticated %}  
+        {% if winning_bid.product.owner == user %}
+            <div style="width: 550px; margin: 10px auto 10px;">
+                <div class="alert alert-success" role="alert">
+                     Congratulations,  {{user}}, you have sold this product for ${{winning_bid.bid | intcomma}} to {{winning_bid.bidder}}!
+                </div>
+            </div>
+        {% endif %}
+    {% endif %}
+   
+    {# Display of active listing #}
+
+    {% if product.active == True %}
+    
+    <div>
+
+
+        {# Key information about the listing #}
+        
+
+        <div class="container">
+              <div class="row">
+                
+                {# Left column (Image) #}
+
+                <div class="col-sm-6">
+                    <div class="square-container">
+                        <div style="content: ''; position: absolute; top: 0; left: 0; width: 120%; height: 120%; background-image: url('{{ product.image | safe}}'); background-repeat: no-repeat; background-position: center; background-size: cover; filter: blur(12px) brightness(120%); z-index: -1; "></div>
+
+                        <img class="p-2" src="{{ product.image | safe}}">
+                        
+                    </div>
+                </div>
+
+
+                {# Right column #}
+
+                <div class="col-sm-6">
+
+
+                    <h2 class="fw-bolder">{{title}}</h2>
+
+                    <div >
+
+                        <i class="bi bi-star-fill orange_text"></i>
+                        <i class="bi bi-star-fill orange_text"></i>
+                        <i class="bi bi-star-fill orange_text"></i>
+                        <i class="bi bi-star-fill orange_text"></i>
+                        <i class="bi bi-star-half orange_text"></i>
+                        <a href="#"><span class="small text-primary">{{product.id}} product ratings</span></a>
+                    </div>
+
+                    <p> <span class="small">Current price:</span> <span class="fs-2"> ${{product.price | intcomma}}/ea </span> </p>
+
+
+                   {# Add to watchlist, remove from watchlist #}
+
+                    {% if user.is_authenticated %}
+                        {% if added == True %}
+                            <a href="{% url 'remove_from_watchlist' product.name %}" class="btn btn-outline-primary link-button mb-2">Remove from watchlist</a>
+                        {% else %}
+                            <a href="{% url 'add_to_watchlist' product.name %}" class="btn btn-outline-primary link-button mb-2">Add to watchlist</a>
+                        {% endif %}
+                    {% endif %}
+
+                    {# Edit listings #}
+
+                    {% if user.is_authenticated %}
+                        {% if owned_by_user == True %}
+                            <a href="{% url 'edit' product.name %}" class="btn btn-primary link-button mb-2">Edit listing</a>
+                        {% endif %}
+                    {% endif %}
+
+
+                   
+
+
+                    {# Present 'bidding' modal #}
+
+                    {% if owned_by_user == False %}
+                            <a data-bs-toggle="modal" data-bs-target="#bidding" type="button"  class="btn btn-primary link-button mb-2">Make offer</a>
+                    {% endif %}
+
+
+
+
+                    {# Signed in user can close listing if somebody bid on it #}
+
+                    {% if owned_by_user == True %}
+                            {% if somebody_bid == True %}
+                            
+                            <form method="post" action="{% url 'close' product.name %}">
+                                {% csrf_token %}
+                                <input type="submit" class="btn btn-primary link-button mb-2" name='close' value="Close bidding">
+                            </form>
+                            {% endif%}
+                    {% endif %}  
+
+
+
+
+
+                    {# Product description container #}
+
+
+                    <div class="right-container my-2" style="height: auto ;border: 1px solid #E5E4E2; border; border-radius: 5px; ">
+                        <div class="p-2">
+                            <p class="small mb-1"> Product Description: </p>
+                            <p>{{product.description}} </p>
+                            <p> <span class="small me-3"> Listed by: </span> <strong> {{product.owner}} </strong></p>
+                            <p> <span class="small me-3"> Category: </span> <strong>{{product.category.category}}<stron></p>
+                        </div>
+                    </div>
+
+
+
+                    {# Bid on product - modal #}
+
+
+                    <div class="modal fade" id="bidding" tabindex="-1" aria-labelledby="exampleModalLabel" aria-hidden="true">
+                      <div class="modal-dialog">
+                        <div class="modal-content">
+                          <div class="modal-header">
+                            <h1 class="modal-title fs-5" id="exampleModalLabel">Bid on product:</h1>
+                            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+                          </div>
+                          <div class="modal-body">
+                            <h6>Current bid is ${{product.price}}/ea<br>
+                                For a successful bid, please bid more than the current bid.
+
+                            </h6>
+                            <form method="post" action="{% url 'bid' product.name %}">
+                                {% csrf_token %}
+                                <input class="form-control form-control-rounded" type="number" step="0.01" name="bid">
+                               
+                          </div>
+                          <div class="modal-footer d-flex justify-content-center">
+                            
+
+                            <button type="submit" class="btn btn-primary link-button mb-2">Make offer</button>
+                          
+                          </div>
+                          </form>
+                        </div>
+                      </div>
+                    </div>
+
+                    
+            
+
+                </div>
+              </div>
+
+        {# Comments section #}
+        
+            <div class="row">
+                <div class="col-sm-12">
+
+
+                    {# Leave comment #}
+
+                    {% if user.is_authenticated %}
+
+                    <div class="right-container mt-5">
+                        
+                        
+                
+                        <h5>Comment:</h5>
+                            
+                            <form method="post" action="{% url 'comment' product.name %}">
+                                {% csrf_token %}
+                                <textarea required rows="3" class="form-control mb-3" name="comment" placeholder="Leave your comment here. Currently signed in as {{user}}"></textarea>
+                                
+                                <input type="submit" class="btn btn-outline-primary mb-3" value="Post comment">
+
+                            </form>
+                        
+                    </div>
+                    {% endif %}
+
+
+                    {# Displays comments #}
+
+                    {% if comments %}
+                    <div class="right-container mt-2" style="height: auto ;border: 1px solid #E5E4E2; border; border-radius: 5px; ">
+                    
+                        <div class="p-2">
+
+                    
+                    <table class="table table-hover">
+                        <thead >
+                            <tr >
+                              <th >Feedback</th>
+                              <th >From</th>
+                              <th >When</th>
+                            </tr>
+                        </thead>
+
+                        {% for comment in comments %}
+                        
+                        <tbody>
+                            
+                            <tr class="fw-light">
+                                <td class="d-flex">
+                                    <i class="bi bi-plus-circle-fill me-3 text-success"></i>
+                                    <p>{{ comment.comment }}</p>
+                                </td>
+                              <td>{{ comment.author }}</td>
+                              <td>{{ comment.timestamp|date:"F d, Y  H:i"  }}</td>
+                            </tr>
+                            
+                        </tbody>
+                        {% endfor %}
+                    </table>
+                    {% endif %}
+
+
+
+                    
+
+                    
+
+
+                        </div>
+                    </div>
+
+
+                   
+
+                    
+                </div>
+            </div>
+
+        </div>
+
+
+        
+        
+
+        
+
+        
+
+        
+
+    </div>
+
+    {# Content shown when listing is inactive #}
+
+    {% else %}
+        
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+                 This listing is inactive.
+            </div>
+        </div>
+        
+        
+
+        <p> <img src="{{ product.image | safe}}" width="400px" style="float: left; margin: 0px 10px 5px 10px; padding: 0px 10px 5px 10px;"></p>
+        <h2> {{product.name}}</h2>
+
+        {% if user.is_authenticated %}
+            {% if added == True %}
+                <a href="/remove_from_watchlist/{{product.name}}" class="btn btn-outline-primary link-button mb-2">Remove from watchlist</a>
+                
+            {% endif %}
+            
+        {% endif %}
+
+    {% endif %}
+
+{% endblock %}

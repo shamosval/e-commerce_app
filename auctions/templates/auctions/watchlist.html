@@ -1,0 +1,25 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Watchlist</h2>
+    </div>
+
+    {% if watchlist_products %}
+    <div style="width: 550px; margin: 10px auto 10px;">
+      <div class="list-group">
+      {% for product in watchlist_products %}
+        <a href="showproduct/{{product.name }}" class="list-group-item list-group-item-action list-group-item-danger">{{product.name}}</a>
+      {% endfor %}
+      </div>
+      {% else %}
+          <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+              Nothing in watchlist... Yet.
+            </div>
+          </div>
+      {% endif %}
+    </div>
+
+
+{% endblock %}

@@ -1,0 +1,45 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Login</h2>
+    </div>
+
+    {% if message %}
+       
+
+        <div style="width: 550px; margin: 10px auto 10px;">
+            <div class="alert alert-danger" role="alert">
+                 {{message}}
+            </div>
+        </div>
+    {% endif %}
+
+    <div style="width: 550px; margin: 10px auto 10px;">
+    
+    <form action="{% url 'login' %}" method="post">
+        {% csrf_token %}
+        
+
+        <div class="form-floating mb-3">
+          <input type="text" class="form-control" id="floatingInput" name="username" placeholder="John">
+          <label for="floatingInput">Username</label>
+        </div>
+
+        <div class="form-floating mb-3">
+          <input type="password" class="form-control" name="password" id="floatingInput2" name="username" placeholder="John">
+          <label for="floatingInput2">Password</label>
+        </div>
+
+        
+
+            <input class="btn btn-outline-primary mb-3" type="submit" value="Login">
+
+    </form>
+
+    Don't have an account? <a href="{% url 'register' %}">Register here.</a>
+
+    </div>
+
+{% endblock %}

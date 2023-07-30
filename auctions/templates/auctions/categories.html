@@ -1,0 +1,38 @@
+{% extends "auctions/layout.html" %}
+
+{% block body %}
+    <div class="d-flex justify-content-center">
+        <h2 class="display-6">Categories</h2>
+    </div>
+
+    
+
+    <div class="container m-auto">
+      <div class="row">
+      
+        {% for category in categories %}
+          <div class="col-sm-4 g-5">
+
+            <div class="card text-center border-0">
+              <div class="card-body">
+          
+                <i class="bi bi-tags-fill fs-3 text-primary card-img-top"></i>
+                <i class="bi bi-tags-fill fs-3 text-primary card-img-top"></i>
+                <i class="bi bi-tags-fill fs-3 text-primary card-img-top"></i>
+                 
+              
+                <h5 class="card-title fs-3 text-secondary-emphasis">{{category.category | upper}}</h5>
+               
+                <a href="show_ctg/{{category.category}}" class="btn btn-outline-primary">See products</a>
+              </div>
+            </div>
+          </div>
+        {% endfor %}
+      </div>
+    </div>
+
+
+   
+  
+
+{% endblock %}
